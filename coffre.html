@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CivicForms.ca — Coffre-fort local (prototype)</title>
+<style>
+  :root{
+    --ink:#0b1220; --ink-2:#16213a; --paper:#f7f8fb; --paper-2:#ffffff;
+    --line:#e4e7ee; --muted:#5c6478; --accent:#0f5c4f; --accent-2:#12897a;
+    --accent-soft:#e6f4f1; --gold:#b8893f; --gold-soft:#f7ecd9; --danger:#b0413e;
+    --radius:14px; --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px rgba(16,24,40,.06);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);min-height:100vh;}
+  .nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 32px;background:var(--paper-2);border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;text-decoration:none;color:var(--ink);}
+  .brand .mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;}
+  .local-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--accent);background:var(--accent-soft);padding:5px 12px;border-radius:999px;font-weight:600;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;border-radius:9px;font-size:14.5px;font-weight:600;cursor:pointer;border:1px solid transparent;text-decoration:none;font-family:inherit;}
+  .btn-accent{background:var(--accent);color:#fff;}
+  .btn-accent:hover{background:#0d4d43;}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line);}
+  .btn-ghost:hover{border-color:#c7ccd8;}
+  .btn-danger{background:transparent;color:var(--danger);border-color:#eadadA;}
+  .btn-sm{padding:7px 14px;font-size:13px;}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 24px 80px;}
+  .card{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:32px;}
+  .center-card{max-width:440px;margin:60px auto 0;text-align:center;}
+  .vault-icon{width:60px;height:60px;border-radius:16px;margin:0 auto 18px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;}
+  h1{font-size:24px;margin:0 0 8px;letter-spacing:-.01em;}
+  h2{font-size:19px;margin:0 0 16px;}
+  p.sub{color:var(--muted);font-size:14px;line-height:1.6;margin:0 0 22px;}
+  label{display:block;font-size:13px;font-weight:600;margin:0 0 6px;text-align:left;}
+  input,select{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:9px;font-size:14.5px;font-family:inherit;background:var(--paper);color:var(--ink);}
+  input:focus,select:focus{outline:none;border-color:var(--accent-2);background:#fff;}
+  .field{margin-bottom:16px;text-align:left;}
+  .msg{font-size:13px;border-radius:9px;padding:10px 14px;margin:0 0 16px;display:none;text-align:left;}
+  .msg.err{display:block;background:#fdf0ef;color:var(--danger);border:1px solid #f3d9d7;}
+  .msg.ok{display:block;background:var(--accent-soft);color:var(--accent);border:1px solid #cfe8e2;}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .grid-3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;}
+  @media(max-width:700px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:0 0 24px;flex-wrap:wrap;}
+  .toolbar h1{margin:0;}
+  .badge-note{background:var(--gold-soft);color:var(--gold);font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;}
+  @media(max-width:900px){.two-col{grid-template-columns:1fr;}}
+  .sin-row{display:flex;gap:8px;align-items:center;}
+  .sin-row input{flex:1;}
+  .demo-form{border:1.5px dashed #c9cfdb;border-radius:var(--radius);padding:26px;background:#fbfcfe;}
+  .demo-form h2{display:flex;align-items:center;gap:10px;}
+  .demo-tag{font-size:10.5px;font-weight:700;text-transform:uppercase;background:#eef0f5;color:var(--muted);padding:3px 8px;border-radius:999px;}
+  .filled-flash{animation:flash 1s ease;}
+  @keyframes flash{0%{background:var(--accent-soft);}100%{background:var(--paper);}}
+  .footer-note{text-align:center;color:var(--muted);font-size:12.5px;margin-top:40px;line-height:1.7;}
+  .hidden{display:none !important;}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <a class="brand" href="/"><span class="mark">CF</span> CivicForms.ca</a>
+  <span class="local-pill">🖥️ Prototype — traitement 100 % local</span>
+  <div class="actions">
+    <button id="btn-lock" class="btn btn-ghost btn-sm hidden">🔒 Verrouiller</button>
+    <a class="btn btn-ghost btn-sm" href="/">← Retour au site</a>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- CREATE -->
+  <div id="view-create" class="card center-card hidden">
+    <div class="vault-icon">🔐</div>
+    <h1>Créez votre coffre-fort</h1>
+    <p class="sub">Choisissez un mot de passe maître. Il chiffre vos données <strong>sur cet appareil uniquement</strong> — personne (pas même nous) ne peut le récupérer si vous l'oubliez.</p>
+    <div id="create-msg" class="msg"></div>
+    <div class="field"><label>Mot de passe maître (min. 8 caractères)</label><input id="create-pw" type="password" autocomplete="new-password"></div>
+    <div class="field"><label>Confirmez le mot de passe</label><input id="create-pw2" type="password" autocomplete="new-password"></div>
+    <button class="btn btn-accent" style="width:100%" onclick="createVault()">Créer mon coffre-fort</button>
+  </div>
+
+  <!-- UNLOCK -->
+  <div id="view-unlock" class="card center-card hidden">
+    <div class="vault-icon">🔒</div>
+    <h1>Coffre-fort verrouillé</h1>
+    <p class="sub">Entrez votre mot de passe maître pour déchiffrer vos informations localement.</p>
+    <div id="unlock-msg" class="msg"></div>
+    <div class="field"><label>Mot de passe maître</label><input id="unlock-pw" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')unlockVault()"></div>
+    <button class="btn btn-accent" style="width:100%" onclick="unlockVault()">Déverrouiller</button>
+    <p class="sub" style="margin-top:18px;font-size:12.5px;">Astuce prototype : vos données chiffrées restent dans ce navigateur. <a href="#" onclick="resetVault();return false;">Réinitialiser le coffre-fort</a> (efface tout).</p>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="view-dash" class="hidden">
+    <div class="toolbar">
+      <h1>Mon coffre-fort</h1>
+      <span class="badge-note">Chiffré AES-256-GCM · clé dérivée PBKDF2 (310 000 itérations)</span>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h2>Mes renseignements</h2>
+        <div id="save-msg" class="msg"></div>
+        <div class="grid-2">
+          <div class="field"><label>Prénom</label><input id="f-prenom"></div>
+          <div class="field"><label>Nom</label><input id="f-nom"></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>Date de naissance</label><input id="f-ddn" type="date"></div>
+          <div class="field"><label>Téléphone</label><input id="f-tel" placeholder="514 555 0123"></div>
+        </div>
+        <div class="field">
+          <label>Numéro d'assurance sociale (NAS)</label>
+          <div class="sin-row">
+            <input id="f-nas" type="password" placeholder="•••-•••-•••">
+            <button class="btn btn-ghost btn-sm" type="button" onclick="toggleNas()" id="nas-eye">👁</button>
+          </div>
+        </div>
+        <div class="field"><label>Adresse</label><input id="f-adresse" placeholder="123 rue Principale, app. 4"></div>
+        <div class="grid-3">
+          <div class="field"><label>Ville</label><input id="f-ville"></div>
+          <div class="field"><label>Province</label>
+            <select id="f-prov">
+              <option>QC</option><option>ON</option><option>BC</option><option>AB</option><option>MB</option>
+              <option>SK</option><option>NS</option><option>NB</option><option>NL</option><option>PE</option>
+              <option>YT</option><option>NT</option><option>NU</option>
+            </select>
+          </div>
+          <div class="field"><label>Code postal</label><input id="f-cp" placeholder="H2X 1Y4"></div>
+        </div>
+        <div class="field"><label>Courriel</label><input id="f-courriel" type="email"></div>
+        <div class="actions">
+          <button class="btn btn-accent" onclick="saveVault()">💾 Enregistrer (chiffré)</button>
+          <button class="btn btn-ghost" onclick="exportVault()">⬇️ Exporter la sauvegarde chiffrée</button>
+        </div>
+      </div>
+
+      <div class="demo-form">
+        <h2>Formulaire de démonstration <span class="demo-tag">simulation SAAQ</span></h2>
+        <p class="sub">Voici comment CivicForms remplit un formulaire à votre place. Cliquez sur le bouton : les champs se remplissent depuis votre coffre-fort déverrouillé, sans qu'aucune donnée ne quitte cet appareil.</p>
+        <button class="btn btn-accent" style="margin-bottom:20px" onclick="autofill()">⚡ Remplir automatiquement depuis mon coffre-fort</button>
+        <div class="grid-2">
+          <div class="field"><label>Nom de famille</label><input id="d-nom" readonly></div>
+          <div class="field"><label>Prénom</label><input id="d-prenom" readonly></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>Date de naissance</label><input id="d-ddn" readonly></div>
+          <div class="field"><label>Téléphone</label><input id="d-tel" readonly></div>
+        </div>
+        <div class="field"><label>Adresse du titulaire</label><input id="d-adresse" readonly></div>
+        <div class="grid-3">
+          <div class="field"><label>Ville</label><input id="d-ville" readonly></div>
+          <div class="field"><label>Province</label><input id="d-prov" readonly></div>
+          <div class="field"><label>Code postal</label><input id="d-cp" readonly></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="footer-note">
+      Prototype de démonstration. Vos données sont chiffrées avec la Web Crypto API de votre navigateur et enregistrées uniquement sur cet appareil.<br>
+      La version finale utilisera Argon2id, l'export/import multi-appareils chiffré et les modèles de formulaires officiels (T1, TP-1, SAAQ, RAMQ…).
+    </p>
+  </div>
+
+</div>
+
+<script>
+const STORE_KEY = 'civicforms_vault_v1';
+let sessionKey = null;   // CryptoKey en mémoire uniquement pendant le déverrouillage
+let vaultData = {};
+
+const enc = new TextEncoder(), dec = new TextDecoder();
+const b64 = a => btoa(String.fromCharCode(...new Uint8Array(a)));
+const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+
+async function deriveKey(password, salt){
+  const base = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    {name:'PBKDF2', salt, iterations:310000, hash:'SHA-256'},
+    base, {name:'AES-GCM', length:256}, false, ['encrypt','decrypt']
+  );
+}
+async function encryptJSON(key, obj){
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv}, key, enc.encode(JSON.stringify(obj)));
+  return {iv:b64(iv), ct:b64(ct)};
+}
+async function decryptJSON(key, blob){
+  const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv:unb64(blob.iv)}, key, unb64(blob.ct));
+  return JSON.parse(dec.decode(pt));
+}
+function getStore(){ try{return JSON.parse(localStorage.getItem(STORE_KEY));}catch(e){return null;} }
+function show(id){
+  ['view-create','view-unlock','view-dash'].forEach(v=>document.getElementById(v).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  document.getElementById('btn-lock').classList.toggle('hidden', id!=='view-dash');
+}
+function msg(id, text, cls){
+  const el = document.getElementById(id);
+  el.textContent = text; el.className = 'msg ' + cls;
+  if(cls==='ok') setTimeout(()=>{el.className='msg';}, 3500);
+}
+
+async function createVault(){
+  const p1 = document.getElementById('create-pw').value, p2 = document.getElementById('create-pw2').value;
+  if(p1.length < 8) return msg('create-msg','Le mot de passe doit contenir au moins 8 caractères.','err');
+  if(p1 !== p2)     return msg('create-msg','Les deux mots de passe ne correspondent pas.','err');
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  sessionKey = await deriveKey(p1, salt);
+  vaultData = {};
+  const blob = await encryptJSON(sessionKey, vaultData);
+  localStorage.setItem(STORE_KEY, JSON.stringify({salt:b64(salt), blob}));
+  fillForm(); show('view-dash');
+}
+
+async function unlockVault(){
+  const store = getStore();
+  const pw = document.getElementById('unlock-pw').value;
+  try{
+    const key = await deriveKey(pw, unb64(store.salt));
+    vaultData = await decryptJSON(key, store.blob);
+    sessionKey = key;
+    document.getElementById('unlock-pw').value = '';
+    fillForm(); show('view-dash');
+  }catch(e){
+    msg('unlock-msg','Mot de passe incorrect — impossible de déchiffrer le coffre-fort.','err');
+  }
+}
+
+function lockVault(){ sessionKey = null; vaultData = {}; clearForm(); show('view-unlock'); }
+document.getElementById('btn-lock').addEventListener('click', lockVault);
+
+function resetVault(){
+  if(!window.__resetArmed){
+    window.__resetArmed = true;
+    msg('unlock-msg','Cliquez à nouveau sur « Réinitialiser » pour confirmer l\'effacement définitif.','err');
+    setTimeout(()=>{window.__resetArmed=false;}, 5000);
+    return;
+  }
+  localStorage.removeItem(STORE_KEY); sessionKey=null; vaultData={}; location.reload();
+}
+
+const FIELDS = ['prenom','nom','ddn','tel','nas','adresse','ville','prov','cp','courriel'];
+function fillForm(){ FIELDS.forEach(f=>{ document.getElementById('f-'+f).value = vaultData[f] || (f==='prov'?'QC':''); }); }
+function clearForm(){ FIELDS.forEach(f=>{ document.getElementById('f-'+f).value=''; }); ['nom','prenom','ddn','tel','adresse','ville','prov','cp'].forEach(f=>document.getElementById('d-'+f).value=''); }
+
+async function saveVault(){
+  if(!sessionKey) return;
+  FIELDS.forEach(f=>{ vaultData[f] = document.getElementById('f-'+f).value; });
+  const store = getStore();
+  store.blob = await encryptJSON(sessionKey, vaultData);
+  localStorage.setItem(STORE_KEY, JSON.stringify(store));
+  msg('save-msg','Coffre-fort chiffré et enregistré sur cet appareil ✓','ok');
+}
+
+function toggleNas(){
+  const el = document.getElementById('f-nas');
+  el.type = el.type === 'password' ? 'text' : 'password';
+  document.getElementById('nas-eye').textContent = el.type==='password' ? '👁' : '🙈';
+}
+
+function autofill(){
+  const map = {nom:'nom',prenom:'prenom',ddn:'ddn',tel:'tel',adresse:'adresse',ville:'ville',prov:'prov',cp:'cp'};
+  Object.entries(map).forEach(([d,f])=>{
+    const el = document.getElementById('d-'+d);
+    el.value = document.getElementById('f-'+f).value;
+    el.classList.remove('filled-flash'); void el.offsetWidth; el.classList.add('filled-flash');
+  });
+}
+
+function exportVault(){
+  const store = getStore();
+  if(!store) return;
+  const blob = new Blob([JSON.stringify({app:'CivicForms.ca',version:1,exportedAt:new Date().toISOString(),...store})], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'civicforms-sauvegarde-chiffree.json';
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+// boot
+show(getStore() ? 'view-unlock' : 'view-create');
+</script>
+</body>
+</html>

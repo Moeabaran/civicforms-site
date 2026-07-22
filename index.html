@@ -208,6 +208,43 @@
   .plan li .ck{color:var(--accent);font-weight:700;}
   .plan .btn{width:100%;}
 
+  /* FAQ */
+  .faq-list{max-width:760px;display:flex;flex-direction:column;gap:12px;}
+  .faq-list details{
+    background:var(--paper-2);border:1px solid var(--line);border-radius:12px;
+    padding:18px 22px;
+  }
+  .faq-list summary{
+    cursor:pointer;font-weight:600;font-size:15px;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+  }
+  .faq-list summary::-webkit-details-marker{display:none;}
+  .faq-list summary::after{content:"+";font-size:20px;color:var(--muted);flex-shrink:0;}
+  .faq-list details[open] summary::after{content:"–";}
+  .faq-list details p{margin:12px 0 0;font-size:14px;color:var(--muted);line-height:1.65;}
+
+  /* CONTACT */
+  .contact-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:40px;align-items:start;}
+  .contact-info p{font-size:14.5px;color:var(--muted);line-height:1.7;margin:0 0 18px;}
+  .contact-form{
+    background:var(--paper-2);border:1px solid var(--line);border-radius:16px;padding:28px;
+    display:flex;flex-direction:column;gap:16px;box-shadow:var(--shadow);
+  }
+  .contact-form label{font-size:13px;font-weight:600;display:block;margin-bottom:6px;}
+  .contact-form input,.contact-form select,.contact-form textarea{
+    width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:9px;
+    font-size:14px;font-family:inherit;background:var(--paper);color:var(--ink);
+  }
+  .contact-form input:focus,.contact-form select:focus,.contact-form textarea:focus{
+    outline:none;border-color:var(--accent-2);background:white;
+  }
+  .contact-form textarea{resize:vertical;min-height:110px;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .contact-note{font-size:12px;color:var(--muted);margin:0;}
+  @media (max-width:900px){
+    .contact-grid,.form-row{grid-template-columns:1fr;}
+  }
+
   footer{
     border-top:1px solid var(--line);padding:36px 48px;
     display:flex;justify-content:space-between;align-items:center;
@@ -234,10 +271,12 @@
     <a href="#comment">Comment ça marche</a>
     <a href="#tarifs">Tarifs</a>
     <a href="#securite">Sécurité</a>
+    <a href="#faq">FAQ</a>
+    <a href="#contact">Contact</a>
   </div>
   <div class="nav-cta">
-    <a class="btn btn-ghost" href="#">Se connecter</a>
-    <a class="btn btn-primary" href="#tarifs">Essayer gratuitement</a>
+    <a class="btn btn-ghost" href="/coffre.html">Se connecter</a>
+    <a class="btn btn-primary" href="/coffre.html">Essayer le prototype</a>
   </div>
 </div>
 
@@ -471,6 +510,86 @@
       </ul>
       <a class="btn btn-primary" href="#">Demander une démo Entreprise</a>
     </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="section-head">
+    <span class="eyebrow">Questions fréquentes</span>
+    <h2>Tout ce que vous vous demandez avant de confier vos infos… à personne d'autre que vous</h2>
+  </div>
+  <div class="faq-list">
+    <details open>
+      <summary>Mes données sont-elles vraiment stockées uniquement sur mon appareil ?</summary>
+      <p>Oui. Votre coffre-fort est chiffré (AES-256) et enregistré uniquement sur votre appareil. Aucun renseignement personnel — nom, adresse, NAS, revenus — n'est transmis aux serveurs de CivicForms.ca ni à aucun tiers. Seule la validation de votre licence transite en ligne, et elle ne contient aucune donnée de votre coffre-fort.</p>
+    </details>
+    <details>
+      <summary>Que se passe-t-il si je perds mon appareil ou mon mot de passe maître ?</summary>
+      <p>Comme personne d'autre que vous ne détient vos données, personne ne peut les récupérer à votre place — c'est le prix de la confidentialité totale. Nous vous recommandons fortement d'utiliser la fonction d'export chiffré pour garder une copie de secours (clé USB, disque externe) et de choisir un mot de passe maître que vous n'oublierez pas.</p>
+    </details>
+    <details>
+      <summary>Comment fonctionne le remplissage des formulaires gouvernementaux ?</summary>
+      <p>Deux modes : (1) l'extension navigateur remplit automatiquement les champs des formulaires web publics (SAAQ, RAMQ, Service Canada) ; (2) pour les portails à connexion sécurisée comme Mon dossier ARC, CivicForms génère plutôt un PDF officiel pré-rempli localement, que vous soumettez vous-même — dans le respect des conditions d'utilisation de chaque organisme.</p>
+    </details>
+    <details>
+      <summary>CivicForms.ca est-il conforme à la Loi 25 et à la LPRPDE ?</summary>
+      <p>L'architecture « zéro cloud » a été pensée pour la conformité : aucun transfert de renseignements personnels hors de votre appareil, donc pas de stockage de données hors Québec/Canada, pas de risque de brèche de serveur central. La collecte minimale (numéro de téléphone pour l'activation de licence) est faite avec consentement explicite et finalité limitée.</p>
+    </details>
+    <details>
+      <summary>Puis-je utiliser CivicForms sur plusieurs appareils ?</summary>
+      <p>Oui — 2 appareils avec la licence Particulier (ex. ordinateur + téléphone), et un nombre illimité de postes avec l'offre Entreprise. La synchronisation se fait par transfert chiffré direct entre vos appareils, sans jamais passer par un serveur intermédiaire.</p>
+    </details>
+    <details>
+      <summary>Y a-t-il un abonnement obligatoire ?</summary>
+      <p>Non. La licence Particulier est un achat unique, valable à vie, activée par votre numéro de téléphone. Les mises à jour des modèles de formulaires sont incluses la première année ; ensuite, elles sont offertes en option — l'application continue de fonctionner même sans renouvellement.</p>
+    </details>
+    <details>
+      <summary>Quels formulaires sont couverts aujourd'hui ?</summary>
+      <p>En priorité : les déclarations de revenus T1 (ARC) et TP-1 (Revenu Québec), puis les renouvellements récurrents — permis de conduire SAAQ, carte RAMQ, passeport, carte de résidence permanente — et les démarches ponctuelles (assurance-emploi, RRQ/CPP, demandes IRCC). La liste s'allonge à chaque mise à jour.</p>
+    </details>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="section-head">
+    <span class="eyebrow">Contact</span>
+    <h2>Une question ? Écrivez-nous</h2>
+  </div>
+  <div class="contact-grid">
+    <div class="contact-info">
+      <p>Que vous soyez un particulier curieux, une PME intéressée par l'offre Entreprise, ou un partenaire potentiel, nous répondons généralement sous 48 h ouvrables.</p>
+      <p><strong>Fidèle à notre philosophie :</strong> ce formulaire n'enregistre rien dans votre navigateur et ne transmet que ce que vous choisissez d'écrire ici.</p>
+    </div>
+    <form class="contact-form" action="https://formsubmit.co/moha25969@gmail.com" method="POST">
+      <input type="hidden" name="_subject" value="Nouveau message — CivicForms.ca">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_next" value="https://www.civicforms.ca/?merci=1">
+      <div class="form-row">
+        <div>
+          <label for="c-nom">Nom</label>
+          <input id="c-nom" name="nom" type="text" required placeholder="Votre nom">
+        </div>
+        <div>
+          <label for="c-email">Courriel</label>
+          <input id="c-email" name="email" type="email" required placeholder="vous@exemple.ca">
+        </div>
+      </div>
+      <div>
+        <label for="c-profil">Vous êtes…</label>
+        <select id="c-profil" name="profil">
+          <option>Un particulier</option>
+          <option>Une entreprise / PME</option>
+          <option>Un média ou partenaire</option>
+          <option>Autre</option>
+        </select>
+      </div>
+      <div>
+        <label for="c-message">Message</label>
+        <textarea id="c-message" name="message" required placeholder="Comment pouvons-nous vous aider ?"></textarea>
+      </div>
+      <button class="btn btn-accent" type="submit">Envoyer le message</button>
+      <p class="contact-note">En envoyant ce message, vous consentez à ce que nous utilisions votre courriel uniquement pour vous répondre. Aucune infolettre, aucun partage.</p>
+    </form>
   </div>
 </section>
 
